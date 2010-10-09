@@ -1,4 +1,5 @@
-== TestGarden
+TestGarden
+==========
 
 A garden of forking tests.[1]
 

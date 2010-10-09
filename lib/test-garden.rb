@@ -145,18 +145,14 @@ class TestGarden
   end
   
   def main topic
-    nest topic do
-      loop do
+    begin
+      nest topic do
         handle_test_results do
           yield
         end
-        teardowns.pop.reverse_each {|block| block.call}
-        teardowns.push []
-        @did_one_test = false
-        @pos[0] = 0
-        break unless @next
       end
-    end
+      @did_one_test = false
+    end while @next
   ensure
     print_report
   end

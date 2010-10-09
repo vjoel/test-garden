@@ -205,6 +205,8 @@ end
 # The block can include essentially any code, including more #test calls,
 # method calls that call #test, assert{} and teardown{} calls, etc.
 #
+# If the block is omitted, then the test is assumed to be incomplete, perhaps
+# a stub indicating future work. Incomplete tests are counted and reported.
 def test topic
   if @test
     @test.nest topic do

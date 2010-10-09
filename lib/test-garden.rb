@@ -40,6 +40,7 @@ class TestGarden
     @enabled = false
     @pattern = params[:pattern]
     @teardowns = []
+    @finishing = false
   end
   
   def enabled?
@@ -81,22 +82,28 @@ class TestGarden
       old_enabled = @enabled
       @enabled = pattern.zip(stack).all? {|pat,subj| !subj or pat === subj}
       if enabled?
-        if verbose?
-          puts "T: #{stack.join(": ")}"
-        end
+        puts "T: #{stack.join(": ")}" if verbose?
+        @finishing = false
         catch :break_test do
           yield
+          @finishing = stack.dup
         end
       else
+        puts "S: #{stack.join(": ")}" if verbose?
         status[:skip] += 1
       end
     
     ensure
+      if not @did_one_test
+        @did_one_test = true
+      else
+        @finishing = false
+      end
+
       teardowns.pop.reverse_each {|block| block.call}
       @enabled = old_enabled
       @pos.pop
       stack.pop
-      @did_one_test = true
       @pos[-1] += 1 if @pos.length > 0
     end
   end
@@ -112,7 +119,7 @@ class TestGarden
     puts "#{report} in #{@main_topic}"
   end
 
-  def handle_test_results
+  def handle_test_exceptions
     yield
 
   rescue Wrong::Assert::AssertionFailedError => ex
@@ -134,7 +141,11 @@ class TestGarden
 
   else
     if enabled?
-      status[:pass] += 1
+      if @finishing
+        status[:pass] += 1
+        puts "P: #{@finishing.join(": ")}" if verbose?
+        @finishing = false
+      end
     else
       raise
     end
@@ -143,7 +154,7 @@ class TestGarden
   def main topic
     begin
       nest topic do
-        handle_test_results do
+        handle_test_exceptions do
           yield
         end
       end
@@ -163,7 +174,7 @@ end
 def test topic
   if @test
     @test.nest topic do
-      @test.handle_test_results do
+      @test.handle_test_exceptions do
         yield
       end
     end

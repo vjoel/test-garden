@@ -1,7 +1,7 @@
 TestGarden
 ==========
 
-A garden of forking tests.[1]
+[A garden of forking tests.][1]
 
 TestGarden is a testing framework for concisely sharing several stages of
 setup code across tests. The shared code is executed once for each test
@@ -38,9 +38,11 @@ If no topics are given, the verbose output is:
 
     T: Thing
     T: Thing: assign foo
+    P: Thing: assign foo
     T: Thing
     T: Thing: compare foo in two instances
-      4 passed,   0 failed,   0 skipped,   0 errors in Thing
+    P: Thing: compare foo in two instances
+      2 passed,   0 failed,   0 skipped,   0 errors in Thing
 
 If a topic list is given, it is treated as a sequence of regular expressions.
 Only tests whose topic path matches those regular expressions, one for one,
@@ -51,11 +53,12 @@ are executed. (Matching is case insensitive.) For example:
 This executes only the the last test. The verbose output is:
 
     T: Thing
+    S: Thing: assign foo
     T: Thing
     T: Thing: compare foo in two instances
-      3 passed,   0 failed,   1 skipped,   0 errors in Thing
+    P: Thing: compare foo in two instances
+      1 passed,   0 failed,   1 skipped,   0 errors in Thing
 
 Note that the "assign foo" test was skipped, and counted as such.
-
 
 [1] In reference to "The garden of forking paths", by J.L. Borges.

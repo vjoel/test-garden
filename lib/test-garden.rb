@@ -100,12 +100,15 @@ class TestGarden
         @finishing = false
       end
 
-      teardowns.pop.reverse_each {|block| block.call}
       @enabled = old_enabled
       @pos.pop
       stack.pop
       @pos[-1] += 1 if @pos.length > 0
     end
+  end
+  
+  def do_teardowns
+    teardowns.pop.reverse_each {|block| block.call}
   end
   
   def print_report
@@ -156,6 +159,7 @@ class TestGarden
       nest topic do
         handle_test_exceptions do
           yield
+          do_teardowns
         end
       end
       @did_one_test = false
@@ -176,6 +180,7 @@ def test topic
     @test.nest topic do
       @test.handle_test_exceptions do
         yield
+        @test.do_teardowns
       end
     end
     

@@ -62,14 +62,14 @@ class TestGarden
       if not @next
         @next = @pos.dup
       end
-      @pos[-1] += 1 if @pos.length > 0 # not top level
+      @pos[-1] += 1 if @pos.length > 0
       return
     end
     
     if @next
       len = [@pos.length, @next.length].min
       if @next[0...len] != @pos[0...len]
-        @pos[-1] += 1 if @pos.length > 0 # not top level
+        @pos[-1] += 1 if @pos.length > 0
         return
       end
       
@@ -101,7 +101,7 @@ class TestGarden
       @pos.pop
       stack.pop
       @did_one_test = true
-      @pos[-1] += 1 if @pos.length > 0 # not top level
+      @pos[-1] += 1 if @pos.length > 0
     end
   end
   
@@ -183,8 +183,7 @@ end
 def teardown(&block)
   if @test
     @test.teardowns.last << block
+  else
+    raise "Cannot teardown: not in a test"
   end
 end
-
-$LOAD_PATH.unshift(File.expand_path("../lib"))
-$LOAD_PATH.unshift(File.expand_path("../ext"))

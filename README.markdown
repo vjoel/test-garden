@@ -1,7 +1,7 @@
 TestGarden
 ==========
 
-[A garden of forking tests.][1]
+A garden of forking tests.[^1]
 
 TestGarden is a testing framework for concisely sharing several stages of
 setup code across tests. The shared code is executed once for each test
@@ -61,4 +61,4 @@ This executes only the the last test. The verbose output is:
 
 Note that the "assign foo" test was skipped, and counted as such.
 
-[1] In reference to "The garden of forking paths", by J.L. Borges.
+[^1]: In reference to "The garden of forking paths", by J.L. Borges.

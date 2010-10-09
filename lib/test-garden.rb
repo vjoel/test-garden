@@ -119,7 +119,9 @@ class TestGarden
     es = "%3d errors" % status[:err]
     es = es.color(:red) if status[:err] > 0
     report = [ps,fs,ss,es].join(", ")
-    puts "#{report} in #{@main_topic}"
+    line = "#{report} in #{@main_topic}"
+    line = line.bright if verbose?
+    puts line
   end
 
   def handle_test_exceptions

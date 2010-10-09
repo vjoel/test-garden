@@ -1,4 +1,4 @@
-require 'test-garden'
+require File.expand_path('../lib/test-garden', File.dirname(__FILE__))
 
 test "array" do
   # set up for each test in this block -- binding not shared between the two

@@ -1,6 +1,15 @@
 require 'wrong'
 include Wrong::Assert
 
+if Wrong.config[:color]
+  require "wrong/rainbow"
+else
+  class String
+    def color(*); self; end
+    def bright; self; end
+  end
+end
+
 # Not directly instantiated by the user. See README and examples.
 class TestGarden
   # Array of nested topics in descending order from the main topic to the topic
@@ -16,6 +25,8 @@ class TestGarden
   # Stack of arrays of procs that will be called tear down the current setup.
   attr_reader :teardowns
   
+  class IncompleteTest < StandardError; end
+
   # Reads params from command line, or from given array of strings. If
   # passing an array, you should call this method *before* all tests.
   def self.params argv=ARGV
@@ -119,6 +130,14 @@ class TestGarden
     es = "%3d errors" % status[:err]
     es = es.color(:red) if status[:err] > 0
     report = [ps,fs,ss,es].join(", ")
+    
+    inc = status[:incomplete]
+    if inc > 0
+      is = "%3d incomplete" % inc
+      is = is.color(:white)
+      report << ", #{is}"
+    end
+    
     line = "#{report} in #{@main_topic}"
     line = line.bright if verbose?
     puts line
@@ -133,6 +152,15 @@ class TestGarden
     ex.backtrace.reverse_each {|l| break if /wrong\/assert.rb/ =~ l; line = l}
     msg = "F: #{stack.join(": ")}: failed assertion, at #{line}"
     puts msg.color(:yellow), ex.message
+    throw :break_test
+  
+  rescue IncompleteTest => ex
+    status[:incomplete] += 1
+    if verbose?
+      msg = "I: #{stack.join(": ")}"
+      msg = msg.color(:white)
+      puts msg
+    end
     throw :break_test
 
   rescue => ex
@@ -181,8 +209,12 @@ def test topic
   if @test
     @test.nest topic do
       @test.handle_test_exceptions do
-        yield
-        @test.do_teardowns
+        if block_given?
+          yield
+          @test.do_teardowns
+        else
+          raise TestGarden::IncompleteTest
+        end
       end
     end
     
@@ -190,7 +222,11 @@ def test topic
     begin
       @test = TestGarden.new
       @test.main topic do
-        yield
+        if block_given?
+          yield
+        else
+          raise TestGarden::IncompleteTest
+        end
       end
     ensure
       @test = nil

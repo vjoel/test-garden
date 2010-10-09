@@ -1,4 +1,4 @@
-require 'test-garden'
+require File.expand_path('../lib/test-garden', File.dirname(__FILE__))
 
 class Thing
   def cleanup; end

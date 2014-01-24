@@ -22,9 +22,11 @@ class TestGarden
   # Array of regexes that restrict which topics are traversed.
   attr_reader :pattern
   
-  # Stack of arrays of procs that will be called tear down the current setup.
+  # Stack of arrays of procs that will be called to tear down the current setup.
   attr_reader :teardowns
-  
+
+  VERSION = '0.4'
+
   class IncompleteTest < StandardError; end
 
   # Reads params from command line, or from given array of strings. If
